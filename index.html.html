@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNPSC Online CBT Examination & Student Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%);
+            --card-bg: rgba(23, 42, 69, 0.85);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --primary-blue: #2563eb;
+            --primary-hover: #1d4ed8;
+            --emerald-accent: #10b981;
+            --amber-accent: #f59e0b;
+            --rose-accent: #f43f5e;
+            --purple-accent: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.75);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .ambient-glow {
+            position: absolute; width: 350px; height: 350px;
+            background: rgba(37, 99, 235, 0.2); filter: blur(100px); border-radius: 50%;
+            top: 5%; left: 10%; z-index: 0; pointer-events: none;
+        }
+        .ambient-glow-2 {
+            position: absolute; width: 300px; height: 300px;
+            background: rgba(16, 185, 129, 0.15); filter: blur(100px); border-radius: 50%;
+            bottom: 5%; right: 10%; z-index: 0; pointer-events: none;
+        }
+
+        /* HIDDEN CREATOR / ADMIN BUTTON IN EXTREME BOTTOM RIGHT CORNER */
+        .admin-secret-btn {
+            position: fixed; 
+            bottom: 6px; 
+            right: 6px; 
+            width: 32px; 
+            height: 32px;
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%; 
+            color: rgba(255, 255, 255, 0.2); 
+            cursor: pointer; 
+            opacity: 0.15;
+            transition: all 0.3s ease; 
+            z-index: 9999; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 13px;
+        }
+        .admin-secret-btn:hover { 
+            opacity: 1; 
+            color: var(--purple-accent); 
+            transform: rotate(90deg); 
+            background: rgba(139, 92, 246, 0.2); 
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .app-view { display: none; width: 100%; min-height: 100vh; position: relative; z-index: 1; flex-direction: column; }
+        .app-view.active { display: flex; }
+
+        .portal-card {
+            background: var(--card-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border); width: 100%; max-width: 480px;
+            padding: 35px 30px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: auto;
+        }
+
+        .brand-header { text-align: center; margin-bottom: 20px; }
+        .portal-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(37, 99, 235, 0.12); color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.25);
+            padding: 6px 16px; border-radius: 30px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px;
+        }
+        .main-title { color: var(--text-main); font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .sub-desc { color: var(--text-sub); font-size: 13px; margin-bottom: 15px; text-align: center; line-height: 1.4; }
+
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+        
+        .input-box-wrapper { position: relative; display: flex; align-items: center; }
+        .input-box-wrapper i.left-icon { position: absolute; left: 16px; color: var(--text-sub); font-size: 15px; }
+        .input-box-wrapper i.toggle-pass { position: absolute; right: 16px; color: var(--text-sub); font-size: 15px; cursor: pointer; }
+        .input-box-wrapper input {
+            width: 100%; padding: 12px 42px 12px 46px;
+            background: var(--input-bg); border: 1px solid var(--card-border);
+            border-radius: 12px; font-size: 14px; color: var(--text-main); outline: none; transition: all 0.3s ease;
+        }
+        .input-box-wrapper input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2); }
+
+        .btn-action {
+            width: 100%; padding: 14px; background: var(--primary-blue); color: #ffffff;
+            border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px;
+        }
+        .btn-action:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        .auth-switch { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-sub); display: flex; justify-content: space-between; }
+        .auth-switch span { color: #60a5fa; font-weight: 700; cursor: pointer; }
+        .auth-switch span:hover { text-decoration: underline; }
+
+        .navbar {
+            background: var(--card-bg); border-bottom: 1px solid var(--card-border);
+            padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px);
+        }
+        .nav-brand { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 800; }
+        .nav-brand i { color: var(--emerald-accent); font-size: 22px; }
+        
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.15); color: var(--rose-accent);
+            border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
+        }
+        .btn-logout:hover { background: var(--rose-accent); color: white; }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.15); color: var(--rose-accent);
+            border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
+            transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-delete:hover { background: var(--rose-accent); color: white; }
+
+        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; width: 100%; flex: 1; display: flex; flex-direction: column; gap: 24px; }
+        
+        .exam-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .exam-card {
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px;
+            display: flex; flex-direction: column; justify-content: space-between; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .exam-card h3 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .exam-card p { font-size: 13px; color: var(--text-sub); }
+        
+        .btn-start {
+            background: var(--emerald-accent); color: #0f172a; border: none; padding: 10px 20px;
+            border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; text-align: center; text-decoration: none;
+            display: inline-block; transition: all 0.3s ease;
+        }
+        .btn-start:hover { background: #059669; color: white; transform: translateY(-1px); }
+
+        .dash-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; }
+        .section-heading { font-size: 16px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--card-border); font-size: 13px; }
+        th { background: rgba(255, 255, 255, 0.02); color: var(--text-sub); font-weight: 700; }
+
+        .badge-rank {
+            background: rgba(245, 158, 11, 0.15); color: var(--amber-accent);
+            padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px;
+        }
+
+        .footer { text-align: center; padding: 20px; border-top: 1px solid var(--card-border); color: var(--text-sub); font-size: 13px; background: var(--card-bg); margin-top: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- HIDDEN SECRET CREATOR BUTTON AT VERY BOTTOM RIGHT CORNER -->
+    <button class="admin-secret-btn" onclick="openAdminModal()" title="Creator Portal">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- LOGIN SECTION -->
+    <section id="loginSection" class="app-view active">
+        <div class="portal-card">
+            <div class="brand-header">
+                <div class="portal-badge"><i class="fa-solid fa-shield-halved"></i> Secure CBT Portal</div>
+                <h1 class="main-title">Candidate Login</h1>
+                <p class="sub-desc">உங்களது Mobile அல்லது Email மற்றும் Password உள்ளிடவும்</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+                <div class="form-group">
+                    <label>Mobile Number or Email ID</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-regular fa-user left-icon"></i>
+                        <input type="text" id="loginIdInput" placeholder="Enter Mobile or Email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-solid fa-lock left-icon"></i>
+                        <input type="password" id="loginPassInput" placeholder="Enter Password" required>
+                        <i class="fa-regular fa-eye toggle-pass" onclick="togglePasswordVisibility('loginPassInput', this)"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-action">
+                    <span>Login</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                <span onclick="switchView('forgetSection')">Forgot Password?</span>
+                <span onclick="switchView('registerSection')">புதிய பதிவு (Register)</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- REGISTER SECTION -->
+    <section id="registerSection" class="app-view">
+        <div class="portal-card">
+            <div class="brand-header">
+                <div class="portal-badge"><i class="fa-solid fa-user-plus"></i> New Candidate</div>
+                <h1 class="main-title">Create Account</h1>
+                <p class="sub-desc">பதிவு செய்ய விவரங்களை உள்ளிடவும்</p>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+                <div class="form-group">
+                    <label>முழு பெயர் (Full Name)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-regular fa-user left-icon"></i>
+                        <input type="text" id="regName" placeholder="Enter your name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>மொபைல் எண் (Mobile Number)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-solid fa-phone left-icon"></i>
+                        <input type="tel" id="regMobile" placeholder="10 digit mobile number" pattern="[0-9]{10}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>மின்னஞ்சல் முகவரி (Email ID)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-regular fa-envelope left-icon"></i>
+                        <input type="email" id="regEmail" placeholder="example@email.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ரகசிய பாஸ்கோடு (Secret Passcode)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-solid fa-key left-icon"></i>
+                        <input type="password" id="regPasscode" placeholder="Enter Access Code" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>புதிய கடவுச்சொல் (New Password)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-solid fa-lock left-icon"></i>
+                        <input type="password" id="regPassword" placeholder="Create Password" required>
+                        <i class="fa-regular fa-eye toggle-pass" onclick="togglePasswordVisibility('regPassword', this)"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-action" style="background: var(--emerald-accent); color: #0f172a;">
+                    <span>Register Account</span> <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+
+            <div class="auth-switch" style="justify-content: center;">
+                Already registered? &nbsp;<span onclick="switchView('loginSection')">Login here</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORGET PASSWORD SECTION -->
+    <section id="forgetSection" class="app-view">
+        <div class="portal-card">
+            <div class="brand-header">
+                <div class="portal-badge" style="color: var(--amber-accent); border-color: rgba(245, 158, 11, 0.3);"><i class="fa-solid fa-key"></i> Reset Password</div>
+                <h1 class="main-title">Forgot Password</h1>
+                <p class="sub-desc">உங்களது Email / Mobile மற்றும் Passcode சரிபார்க்கவும்</p>
+            </div>
+
+            <!-- Step 1: Verification Form -->
+            <form id="forgetStep1Form" onsubmit="handleForgetVerify(event)">
+                <div class="form-group">
+                    <label>Email ID or Mobile Number</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-regular fa-user left-icon"></i>
+                        <input type="text" id="forgetUserIdentifier" placeholder="Enter Email or Mobile" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ரகசிய பாஸ்கோடு (Secret Passcode)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-solid fa-key left-icon"></i>
+                        <input type="password" id="forgetPasscode" placeholder="Enter Access Code" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-action" style="background: var(--amber-accent); color: #0f172a;">
+                    <span>Verify Details</span> <i class="fa-solid fa-circle-check"></i>
+                </button>
+            </form>
+
+            <!-- Step 2: Set New Password Form -->
+            <form id="forgetStep2Form" onsubmit="handleForgetResetPassword(event)" style="display: none;">
+                <div class="form-group">
+                    <label>புதிய கடவுச்சொல் (New Password)</label>
+                    <div class="input-box-wrapper">
+                        <i class="fa-solid fa-lock left-icon"></i>
+                        <input type="password" id="forgetNewPass" placeholder="Enter New Password" required>
+                        <i class="fa-regular fa-eye toggle-pass" onclick="togglePasswordVisibility('forgetNewPass', this)"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-action" style="background: var(--emerald-accent); color: #0f172a;">
+                    <span>Update Password</span> <i class="fa-solid fa-rotate"></i>
+                </button>
+            </form>
+
+            <div class="auth-switch" style="justify-content: center; margin-top: 20px;">
+                Remembered Password? &nbsp;<span onclick="resetForgetForm(); switchView('loginSection');">Login here</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- STUDENT DASHBOARD -->
+    <section id="dashboardSection" class="app-view">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>TNPSC CBT - STUDENT DASHBOARD</span>
+            </div>
+            <button class="btn-logout" onclick="logoutSession()">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="welcome-banner" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%); border: 1px solid var(--card-border); border-radius: 20px; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div class="welcome-text">
+                    <h2 id="studentWelcomeName" style="font-size: 24px; font-weight: 800; margin-bottom: 6px;">வணக்கம், தேர்வர்!</h2>
+                    <p style="color: var(--text-sub); font-size: 14px;" id="studentProfileDetails">உங்களது விவரங்கள்...</p>
+                </div>
+            </div>
+
+            <!-- Available Exams Card -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-laptop-code" style="color: var(--emerald-accent);"></i>
+                    <span>கிடைக்கக்கூடிய தேர்வுகள் (Published CBT Exams)</span>
+                </div>
+                <div id="publishedTestsContainer" class="exam-cards-grid">
+                    <!-- Dynamic Test Cards -->
+                </div>
+            </div>
+
+            <!-- Student Completed History -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-clipboard-list" style="color: var(--primary-blue);"></i>
+                    <span>உங்கள் சமீபத்திய தேர்வு விவரங்கள் (My Completed Exam History)</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Test Subject & Unit</th>
+                                <th>Standard</th>
+                                <th>Score</th>
+                                <th>Accuracy</th>
+                                <th>Time Taken</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentScoresBody">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-sub);">எந்தத் தேர்வும் எழுதப்படவில்லை.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Student Overall Leaderboard -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-trophy" style="color: var(--amber-accent);"></i>
+                    <span>ஒட்டுமொத்த மாணவர் தரவரிசை (Overall Candidate Leaderboard)</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Exams Completed</th>
+                                <th>Total Score Earned</th>
+                                <th>Average Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentOverallRankingBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தரவரிசை விவரங்கள் கிடைக்கவில்லை.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Student Individual Exam Leaderboard -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-chart-line" style="color: var(--purple-accent);"></i>
+                    <span>தேர்வு வாரியான தரவரிசை (Individual Exam Leaderboard)</span>
+                </div>
+                <div class="form-group" style="max-width: 320px; margin-bottom: 15px;">
+                    <label>தேர்வை தேர்ந்தெடுக்கவும்:</label>
+                    <select id="studentExamFilter" onchange="renderStudentIndividualRanking()" style="width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none;">
+                        <option value="">Select an Exam</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Score</th>
+                                <th>Accuracy</th>
+                                <th>Time Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentIndividualRankingBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தேர்வைத் தேர்ந்தெடுக்கவும்.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">© 2026 TNPSC CBT Portal. Active Student Session.</footer>
+    </section>
+
+    <!-- ADMIN PANEL VIEW -->
+    <section id="adminPanelView" class="app-view">
+        <nav class="navbar" style="background: #090d16;">
+            <div class="nav-brand">
+                <i class="fa-solid fa-user-shield" style="color: var(--purple-accent);"></i>
+                <span>TNPSC - ADMIN ANALYTICS & CREATOR PANEL</span>
+            </div>
+            <button class="btn-logout" onclick="switchView('loginSection')">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout Admin
+            </button>
+        </nav>
+
+        <div class="dashboard-container">
+            <!-- 1. Publish Test Form -->
+            <div class="dash-card" style="border-color: rgba(139, 92, 246, 0.4);">
+                <div class="section-heading">
+                    <i class="fa-solid fa-circle-plus" style="color: var(--purple-accent);"></i>
+                    <span>புதிய டெஸ்ட் ஃபைல் / லிங்கை அப்லோட் செய்தல் (Publish New Test Link)</span>
+                </div>
+                <form id="createTestForm" onsubmit="handlePublishTest(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;">
+                    <div class="form-group" style="margin: 0;">
+                        <label>சப்ஜெக்ட் பெயர் (Subject)</label>
+                        <div class="input-box-wrapper">
+                            <input type="text" id="adminSubject" placeholder="எ.கா: Economics" required>
+                            <i class="fa-solid fa-book left-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>வகுப்பு / தரம் (Standard)</label>
+                        <div class="input-box-wrapper">
+                            <input type="text" id="adminStandard" placeholder="எ.கா: 11th Standard" required>
+                            <i class="fa-solid fa-graduation-cap left-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>யூனிட் & லெசன் (Unit/Topic)</label>
+                        <div class="input-box-wrapper">
+                            <input type="text" id="adminUnit" placeholder="எ.கா: Unit 7" required>
+                            <i class="fa-solid fa-bookmark left-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>மொத்த கேள்விகள் (Total Qns)</label>
+                        <div class="input-box-wrapper">
+                            <input type="number" id="adminTotalQns" placeholder="எ.கா: 50" value="50" min="1" required>
+                            <i class="fa-solid fa-list-ol left-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin: 0; grid-column: span 2;">
+                        <label>டெஸ்ட் HTML கோப்பு லிங்க் (GitHub / External Test File URL)</label>
+                        <div class="input-box-wrapper">
+                            <input type="url" id="adminTestUrl" placeholder="https://username.github.io/repo/test.html" required>
+                            <i class="fa-solid fa-link left-icon"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-action" style="background: var(--purple-accent); margin: 0; height: 46px;">
+                        <span>Publish Test Link</span> <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 2. Registered Students Data & Management -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-users" style="color: #38bdf8;"></i>
+                    <span>பதிவு செய்த மாணவர்கள் பட்டியல் (Registered Candidates Analytics)</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Mobile Number</th>
+                                <th>Email ID</th>
+                                <th>Total Exams Taken</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminStudentsTableBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-sub);">மாணவர்கள் யாரும் பதிவு செய்யவில்லை.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Overall Student Leaderboard -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-trophy" style="color: var(--amber-accent);"></i>
+                    <span>ஒட்டுமொத்த மாணவர் தரவரிசை (Overall Performance Ranking)</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Exams Completed</th>
+                                <th>Total Score Earned</th>
+                                <th>Average Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOverallRankingBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தரவரிசை விவரங்கள் கிடைக்கவில்லை.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. Individual Test-wise Leaderboard -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-chart-line" style="color: var(--emerald-accent);"></i>
+                    <span>தேர்வு வாரியான தரவரிசை (Individual Exam-wise Leaderboard)</span>
+                </div>
+                <div class="form-group" style="max-width: 300px; margin-bottom: 15px;">
+                    <label>தேர்வை தேர்ந்தெடுக்கவும்:</label>
+                    <select id="adminExamFilter" onchange="renderIndividualExamRanking()" style="width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none;">
+                        <option value="">Select an Exam</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Score</th>
+                                <th>Accuracy</th>
+                                <th>Time Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminIndividualRankingBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தேர்வைத் தேர்ந்தெடுக்கவும்.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. Published Tests Management -->
+            <div class="dash-card">
+                <div class="section-heading">
+                    <i class="fa-solid fa-list-check" style="color: var(--purple-accent);"></i>
+                    <span>வெளியிடப்பட்ட டெஸ்ட்களை நிர்வகித்தல் & நீக்குதல்</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subject & Unit</th>
+                                <th>Standard</th>
+                                <th>Total Qns</th>
+                                <th>Test URL</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminManageTestsBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-sub);">வெளியிடப்பட்ட தேர்வுகள் இல்லை.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">© 2026 TNPSC CBT Portal. Admin Creator Secured.</footer>
+    </section>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminModal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(2,6,23,0.85); backdrop-filter: blur(8px); z-index:10000; justify-content:center; align-items:center; padding:20px;">
+        <div class="portal-card" style="max-width: 400px; position: relative;">
+            <button onclick="closeAdminModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-sub); font-size: 18px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+            <div class="brand-header" style="margin-bottom: 16px;">
+                <h1 class="main-title" style="font-size: 18px;">Admin Portal Login</h1>
+            </div>
+            <div class="form-group">
+                <label>Admin Username</label>
+                <input type="text" id="adminUser" placeholder="Username" style="width:100%; padding:12px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:10px; color:#fff;">
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Password</label>
+                <input type="password" id="adminPass" placeholder="Password" style="width:100%; padding:12px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:10px; color:#fff;">
+            </div>
+            <button class="btn-action" style="background: var(--purple-accent);" onclick="verifyAdmin()">Login to Admin Panel</button>
+        </div>
+    </div>
+
+    <script>
+        const SECRET_PASSCODE = "848935"; 
+        let verifiedUserIndex = -1; 
+
+        function getStoredUsers() { return JSON.parse(localStorage.getItem('cbt_users') || '[]'); }
+        function saveStoredUsers(users) { localStorage.setItem('cbt_users', JSON.stringify(users)); }
+
+        function getStoredTests() { return JSON.parse(localStorage.getItem('cbt_published_tests') || '[]'); }
+        function saveStoredTests(tests) { localStorage.setItem('cbt_published_tests', JSON.stringify(tests)); }
+
+        function switchView(sectionId) {
+            document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function togglePasswordVisibility(inputId, iconEl) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconEl.classList.remove("fa-eye");
+                iconEl.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                iconEl.classList.remove("fa-eye-slash");
+                iconEl.classList.add("fa-eye");
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const idVal = document.getElementById('loginIdInput').value.trim();
+            const passVal = document.getElementById('loginPassInput').value;
+
+            const users = getStoredUsers();
+            const user = users.find(u => (u.mobile === idVal || u.email === idVal) && u.password === passVal);
+
+            if(user) {
+                localStorage.setItem('tnpsc_candidate_name', user.name);
+                showStudentDashboard(user.name);
+            } else {
+                alert('தவறான Login ID அல்லது Password!');
+            }
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const mobile = document.getElementById('regMobile').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const passcode = document.getElementById('regPasscode').value;
+            const password = document.getElementById('regPassword').value;
+
+            if(passcode !== SECRET_PASSCODE) {
+                alert('தவறான ரகசிய பாஸ்கோடு!');
+                return;
+            }
+
+            let users = getStoredUsers();
+            if(users.some(u => u.mobile === mobile || u.email === email)) {
+                alert('இந்த Mobile அல்லது Email ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது!');
+                return;
+            }
+
+            users.push({ name, mobile, email, password, scores: [] });
+            saveStoredUsers(users);
+
+            localStorage.setItem('tnpsc_candidate_name', name);
+            alert('பதிவு வெற்றிகரமாக முடிந்தது!');
+            showStudentDashboard(name);
+        }
+
+        function handleForgetVerify(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('forgetUserIdentifier').value.trim();
+            const passcode = document.getElementById('forgetPasscode').value;
+
+            if(passcode !== SECRET_PASSCODE) {
+                alert('தவறான ரகசிய பாஸ்கோடு!');
+                return;
+            }
+
+            let users = getStoredUsers();
+            verifiedUserIndex = users.findIndex(u => u.mobile === identifier || u.email === identifier);
+
+            if(verifiedUserIndex !== -1) {
+                document.getElementById('forgetStep1Form').style.display = 'none';
+                document.getElementById('forgetStep2Form').style.display = 'block';
+            } else {
+                alert('உள்ளிடப்பட்ட Email/Mobile கணக்கு கண்டறியப்படவில்லை!');
+            }
+        }
+
+        function handleForgetResetPassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('forgetNewPass').value;
+
+            if(verifiedUserIndex !== -1) {
+                let users = getStoredUsers();
+                users[verifiedUserIndex].password = newPass;
+                saveStoredUsers(users);
+
+                alert('கடவுச்சொல் வெற்றிகரமாக மாற்றப்பட்டது! புதிய கடவுச்சொல் மூலம் லாகின் செய்யவும்.');
+                resetForgetForm();
+                switchView('loginSection');
+            }
+        }
+
+        function resetForgetForm() {
+            verifiedUserIndex = -1;
+            document.getElementById('forgetStep1Form').reset();
+            document.getElementById('forgetStep2Form').reset();
+            document.getElementById('forgetStep1Form').style.display = 'block';
+            document.getElementById('forgetStep2Form').style.display = 'none';
+        }
+
+        function showStudentDashboard(name) {
+            switchView('dashboardSection');
+            document.getElementById('studentWelcomeName').innerText = `வணக்கம், ${name}!`;
+            
+            const users = getStoredUsers();
+            const currentUser = users.find(u => u.name === name);
+            if(currentUser) {
+                document.getElementById('studentProfileDetails').innerHTML = `மொபைல்: <strong>${currentUser.mobile}</strong> | மின்னஞ்சல்: <strong>${currentUser.email}</strong>`;
+            }
+
+            loadPublishedTestsForStudents();
+            loadStudentScores(name);
+            renderStudentOverallRanking();
+            populateStudentExamDropdown();
+        }
+
+        function launchExternalTestWindow(testUrl) {
+            if(testUrl) { window.open(testUrl, '_blank'); }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'EXIT_AND_SAVE_SCORE') {
+                const currentCandidate = localStorage.getItem('tnpsc_candidate_name');
+                if(!currentCandidate) return;
+
+                const scoreRecord = {
+                    subjectUnit: event.data.subjectUnit || 'Exam',
+                    standard: event.data.standard || 'General',
+                    scoreText: `${event.data.rawScore} / ${event.data.totalQns}`,
+                    rawScore: event.data.rawScore,
+                    totalQns: event.data.totalQns,
+                    accuracy: event.data.accuracy,
+                    timeTaken: event.data.timeTaken
+                };
+
+                let users = getStoredUsers();
+                let userIndex = users.findIndex(u => u.name === currentCandidate);
+
+                if(userIndex !== -1) {
+                    if(!users[userIndex].scores) users[userIndex].scores = [];
+                    
+                    users[userIndex].scores = users[userIndex].scores.filter(s => s.subjectUnit !== scoreRecord.subjectUnit);
+                    users[userIndex].scores.push(scoreRecord);
+                    
+                    saveStoredUsers(users);
+                    loadStudentScores(currentCandidate);
+                    renderStudentOverallRanking();
+                    renderStudentIndividualRanking();
+                }
+            }
+        });
+
+        function loadPublishedTestsForStudents() {
+            const container = document.getElementById('publishedTestsContainer');
+            const tests = getStoredTests();
+            container.innerHTML = '';
+
+            if(tests.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-sub);">தற்போது புதிய தேர்வுகள் எதுவும் கிடைக்கவில்லை.</p>';
+                return;
+            }
+
+            tests.forEach(test => {
+                const card = document.createElement('div');
+                card.className = 'exam-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="portal-badge" style="margin-bottom:8px;">${test.standard} | Total Qns: ${test.totalQns}</div>
+                        <h3>${test.subject}</h3>
+                        <p>${test.unit}</p>
+                    </div>
+                    <button class="btn-start" onclick="launchExternalTestWindow('${test.testUrl}')">
+                        <i class="fa-solid fa-play"></i> Start Exam
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function loadStudentScores(name) {
+            const tbody = document.getElementById('studentScoresBody');
+            const users = getStoredUsers();
+            const user = users.find(u => u.name === name);
+
+            if(!user || !user.scores || user.scores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-sub);">எந்தத் தேர்வும் எழுதப்படவில்லை.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            user.scores.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.subjectUnit}</td>
+                        <td>${s.standard}</td>
+                        <td><strong>${s.scoreText}</strong></td>
+                        <td><span style="color: var(--amber-accent); font-weight:700;">${s.accuracy}</span></td>
+                        <td>${s.timeTaken}</td>
+                        <td><span style="color: var(--emerald-accent); font-weight:700;">Completed</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderStudentOverallRanking() {
+            const tbody = document.getElementById('studentOverallRankingBody');
+            const users = getStoredUsers();
+
+            let overallStats = users.map(u => {
+                let totalScore = 0;
+                let totalAccuracy = 0;
+                let count = u.scores ? u.scores.length : 0;
+
+                if(count > 0) {
+                    u.scores.forEach(s => {
+                        totalScore += (s.rawScore || 0);
+                        totalAccuracy += parseFloat(s.accuracy || 0);
+                    });
+                }
+
+                return {
+                    name: u.name,
+                    count: count,
+                    totalScore: totalScore,
+                    avgAccuracy: count > 0 ? (totalAccuracy / count).toFixed(1) + '%' : '0%'
+                };
+            }).filter(u => u.count > 0);
+
+            overallStats.sort((a, b) => b.totalScore - a.totalScore);
+
+            if(overallStats.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தரவரிசை விவரங்கள் கிடைக்கவில்லை.</td></tr>';
+            } else {
+                tbody.innerHTML = '';
+                overallStats.forEach((st, idx) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="badge-rank">#${idx + 1}</span></td>
+                            <td><strong>${st.name}</strong></td>
+                            <td>${st.count}</td>
+                            <td><strong style="color:var(--emerald-accent);">${st.totalScore} Marks</strong></td>
+                            <td>${st.avgAccuracy}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function populateStudentExamDropdown() {
+            const examFilter = document.getElementById('studentExamFilter');
+            const tests = getStoredTests();
+            examFilter.innerHTML = '<option value="">Select an Exam</option>';
+            tests.forEach(t => {
+                const label = `${t.subject} - ${t.unit}`;
+                examFilter.innerHTML += `<option value="${label}">${label} (${t.standard})</option>`;
+            });
+        }
+
+        function renderStudentIndividualRanking() {
+            const selectedExam = document.getElementById('studentExamFilter').value;
+            const tbody = document.getElementById('studentIndividualRankingBody');
+
+            if(!selectedExam) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தேர்வைத் தேர்ந்தெடுக்கவும்.</td></tr>';
+                return;
+            }
+
+            const users = getStoredUsers();
+            let rankList = [];
+
+            users.forEach(u => {
+                if(u.scores) {
+                    const foundScore = u.scores.find(s => s.subjectUnit === selectedExam);
+                    if(foundScore) {
+                        rankList.push({
+                            name: u.name,
+                            scoreText: foundScore.scoreText,
+                            rawScore: foundScore.rawScore,
+                            accuracy: foundScore.accuracy,
+                            timeTaken: foundScore.timeTaken
+                        });
+                    }
+                }
+            });
+
+            rankList.sort((a, b) => b.rawScore - a.rawScore);
+
+            if(rankList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">இந்தத் தேர்வை இன்னும் யாரும் எழுதவில்லை.</td></tr>';
+            } else {
+                tbody.innerHTML = '';
+                rankList.forEach((r, idx) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="badge-rank">#${idx + 1}</span></td>
+                            <td><strong>${r.name}</strong></td>
+                            <td><strong style="color:var(--emerald-accent);">${r.scoreText}</strong></td>
+                            <td>${r.accuracy}</td>
+                            <td>${r.timeTaken}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function logoutSession() {
+            localStorage.removeItem('tnpsc_candidate_name');
+            switchView('loginSection');
+        }
+
+        function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
+        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+        function verifyAdmin() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+
+            if(u === 'Nazzim' && p === 'Dude/28@') {
+                closeAdminModal();
+                switchView('adminPanelView');
+                loadAdminData();
+            } else {
+                alert('தவறான அட்மின் லாகின்!');
+            }
+        }
+
+        function handlePublishTest(e) {
+            e.preventDefault();
+            const subject = document.getElementById('adminSubject').value.trim();
+            const standard = document.getElementById('adminStandard').value.trim(); 
+            const unit = document.getElementById('adminUnit').value.trim();
+            const totalQns = parseInt(document.getElementById('adminTotalQns').value);
+            const testUrl = document.getElementById('adminTestUrl').value.trim();
+
+            let tests = getStoredTests();
+            tests.push({ id: Date.now(), subject, standard, unit, totalQns, testUrl });
+            saveStoredTests(tests);
+
+            alert('டெஸ்ட் லிங்க் வெற்றிகரமாக வெளியிடப்பட்டது!');
+            document.getElementById('createTestForm').reset();
+            loadAdminData();
+        }
+
+        function deletePublishedTest(testId) {
+            if(confirm("நிச்சயமாக இந்தத் தேர்வை நீக்க விரும்புகிறீர்களா?")) {
+                let tests = getStoredTests();
+                tests = tests.filter(t => t.id !== testId);
+                saveStoredTests(tests);
+                loadAdminData();
+            }
+        }
+
+        function deleteUserAccount(mobile) {
+            if(confirm("நிச்சயமாக இந்த மாணவரின் கணக்கை நீக்க விரும்புகிறீர்களா?")) {
+                let users = getStoredUsers();
+                users = users.filter(u => u.mobile !== mobile);
+                saveStoredUsers(users);
+                loadAdminData();
+            }
+        }
+
+        function loadAdminData() {
+            const users = getStoredUsers();
+            const tests = getStoredTests();
+
+            const studentsBody = document.getElementById('adminStudentsTableBody');
+            if(users.length === 0) {
+                studentsBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">மாணவர்கள் யாரும் பதிவு செய்யவில்லை.</td></tr>';
+            } else {
+                studentsBody.innerHTML = '';
+                users.forEach(u => {
+                    const examsCount = u.scores ? u.scores.length : 0;
+                    studentsBody.innerHTML += `
+                        <tr>
+                            <td><strong>${u.name}</strong></td>
+                            <td>${u.mobile}</td>
+                            <td>${u.email}</td>
+                            <td><span class="badge-rank">${examsCount} Exams</span></td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteUserAccount('${u.mobile}')">
+                                    <i class="fa-solid fa-user-slash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const overallBody = document.getElementById('adminOverallRankingBody');
+            let overallStats = users.map(u => {
+                let totalScore = 0;
+                let totalAccuracy = 0;
+                let count = u.scores ? u.scores.length : 0;
+
+                if(count > 0) {
+                    u.scores.forEach(s => {
+                        totalScore += (s.rawScore || 0);
+                        totalAccuracy += parseFloat(s.accuracy || 0);
+                    });
+                }
+
+                return {
+                    name: u.name,
+                    count: count,
+                    totalScore: totalScore,
+                    avgAccuracy: count > 0 ? (totalAccuracy / count).toFixed(1) + '%' : '0%'
+                };
+            }).filter(u => u.count > 0);
+
+            overallStats.sort((a, b) => b.totalScore - a.totalScore);
+
+            if(overallStats.length === 0) {
+                overallBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தேர்வு எழுதியவர்கள் யாரும் இல்லை.</td></tr>';
+            } else {
+                overallBody.innerHTML = '';
+                overallStats.forEach((st, idx) => {
+                    overallBody.innerHTML += `
+                        <tr>
+                            <td><span class="badge-rank">#${idx + 1}</span></td>
+                            <td><strong>${st.name}</strong></td>
+                            <td>${st.count}</td>
+                            <td><strong style="color:var(--emerald-accent);">${st.totalScore} Marks</strong></td>
+                            <td>${st.avgAccuracy}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const examFilter = document.getElementById('adminExamFilter');
+            examFilter.innerHTML = '<option value="">Select an Exam</option>';
+            tests.forEach(t => {
+                const label = `${t.subject} - ${t.unit}`;
+                examFilter.innerHTML += `<option value="${label}">${label} (${t.standard})</option>`;
+            });
+
+            const manageTestsBody = document.getElementById('adminManageTestsBody');
+            if(tests.length === 0) {
+                manageTestsBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">வெளியிடப்பட்ட தேர்வுகள் இல்லை.</td></tr>';
+            } else {
+                manageTestsBody.innerHTML = '';
+                tests.forEach(t => {
+                    manageTestsBody.innerHTML += `
+                        <tr>
+                            <td><strong>${t.subject}</strong> - ${t.unit}</td>
+                            <td>${t.standard}</td>
+                            <td>${t.totalQns} Qns</td>
+                            <td style="word-break: break-all; font-size:11px;">${t.testUrl}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deletePublishedTest(${t.id})">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function renderIndividualExamRanking() {
+            const selectedExam = document.getElementById('adminExamFilter').value;
+            const tbody = document.getElementById('adminIndividualRankingBody');
+
+            if(!selectedExam) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">தேர்வைத் தேர்ந்தெடுக்கவும்.</td></tr>';
+                return;
+            }
+
+            const users = getStoredUsers();
+            let rankList = [];
+
+            users.forEach(u => {
+                if(u.scores) {
+                    const foundScore = u.scores.find(s => s.subjectUnit === selectedExam);
+                    if(foundScore) {
+                        rankList.push({
+                            name: u.name,
+                            scoreText: foundScore.scoreText,
+                            rawScore: foundScore.rawScore,
+                            accuracy: foundScore.accuracy,
+                            timeTaken: foundScore.timeTaken
+                        });
+                    }
+                }
+            });
+
+            rankList.sort((a, b) => b.rawScore - a.rawScore);
+
+            if(rankList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">இந்தத் தேர்வை இன்னும் யாரும் எழுதவில்லை.</td></tr>';
+            } else {
+                tbody.innerHTML = '';
+                rankList.forEach((r, idx) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="badge-rank">#${idx + 1}</span></td>
+                            <td><strong>${r.name}</strong></td>
+                            <td><strong style="color:var(--emerald-accent);">${r.scoreText}</strong></td>
+                            <td>${r.accuracy}</td>
+                            <td>${r.timeTaken}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('tnpsc_candidate_name');
+            if(savedUser) { 
+                showStudentDashboard(savedUser); 
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="TNPSC CBT Examination Portal">
+<title>TNPSC CBT Examination Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#07111f;--card:#12243a;--line:rgba(255,255,255,.12);--blue:#2563eb;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--text:#f8fafc;--muted:#a5b4c7;--input:#0b192b}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif}
+body{min-height:100vh;background:radial-gradient(circle at 15% 15%,#15345d 0,#07111f 42%),#07111f;color:var(--text);display:flex;align-items:center;justify-content:center;padding:20px}
+.bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 85% 80%,rgba(16,185,129,.09),transparent 28%)}
+.card{width:100%;max-width:480px;background:rgba(18,36,58,.94);border:1px solid var(--line);border-radius:24px;padding:34px 30px;box-shadow:0 24px 70px rgba(0,0,0,.38);position:relative;z-index:1}
+.creator-btn{position:fixed;right:16px;top:16px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#ffffff0b;color:#9fb0c4;opacity:.32;cursor:pointer}.creator-btn:hover{opacity:1}
+.header{text-align:center;margin-bottom:26px}.badge{display:inline-flex;gap:7px;padding:6px 13px;border-radius:999px;border:1px solid #60a5fa40;background:#2563eb18;color:#93c5fd;font-size:11px;font-weight:700;margin-bottom:13px}
+h1{font-size:25px;line-height:1.25;margin-bottom:10px}.chips{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}.chip{font-size:10px;color:#cbd5e1;padding:4px 8px;border-radius:6px;background:#ffffff08;border:1px solid #ffffff0d}
+.group{margin-bottom:16px}.group label{display:block;font-size:12px;font-weight:700;color:#dbe5ef;margin-bottom:7px}.wrap{position:relative}.wrap>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8394aa;pointer-events:none}
+input{width:100%;padding:13px 44px 13px 43px;background:var(--input);color:var(--text);border:1px solid var(--line);border-radius:11px;outline:0;font-size:14px}input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #2563eb26}
+.toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:0;color:#8798ad;cursor:pointer;padding:5px}
+.btn{width:100%;border:0;border-radius:11px;padding:13px 14px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:8px}.primary{background:var(--blue)}.green{background:var(--green)}.amber{background:var(--amber);color:#17110a}.red{background:var(--red)}.btn:disabled{opacity:.55;cursor:not-allowed}
+.links{display:flex;justify-content:space-between;gap:12px;margin-top:17px;font-size:11px}.links a{color:#93c5fd;cursor:pointer;text-decoration:none}.links a:hover{text-decoration:underline}
+.footer{margin-top:24px;padding-top:17px;border-top:1px solid var(--line);display:flex;justify-content:space-around;color:var(--muted);font-size:10px}.feature{text-align:center}.feature i{display:block;color:#6ee7b7;font-size:14px;margin-bottom:4px}
+.modal{display:none;position:fixed;inset:0;background:#020617dd;backdrop-filter:blur(7px);z-index:50;padding:15px;align-items:center;justify-content:center}.modal.open{display:flex}.modal-card{width:100%;max-width:470px;max-height:92vh;overflow:auto;background:#12243a;border:1px solid var(--line);border-radius:20px;padding:28px 22px;position:relative}.close{position:absolute;right:14px;top:12px;border:0;background:0;color:#9aaabd;font-size:18px;cursor:pointer}.title{font-size:18px;font-weight:800;margin-bottom:20px;display:flex;gap:9px;align-items:center}.note{font-size:11px;line-height:1.65;color:var(--muted);margin:9px 0 15px}.status{display:none;margin:10px 0;padding:10px 12px;border-radius:10px;font-size:11px;line-height:1.55}.status.show{display:block}.status.ok{background:#10b98114;border:1px solid #10b98142;color:#a7f3d0}.status.err{background:#ef444414;border:1px solid #ef444442;color:#fecaca}.status.warn{background:#f59e0b14;border:1px solid #f59e0b42;color:#fde68a}.step{display:none}.step.active{display:block}.otp{padding-left:14px;text-align:center;letter-spacing:7px;font-weight:800;font-size:18px}.timer{font-size:10px;color:var(--muted);margin-top:7px}
+@media(max-width:480px){body{padding:12px}.card{padding:28px 20px}.links{flex-direction:column;text-align:center}.footer{gap:6px}.modal-card{padding:25px 17px}}
+</style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<!-- Hidden Creator Access -->
+<button class="creator-btn" onclick="openModal('creatorModal')" aria-label="Creator Access" title="Creator Access">
+    <i class="fa-solid fa-gear"></i>
+</button>
+
+<main class="card">
+    <header class="header">
+        <div class="badge">
+            <i class="fa-solid fa-laptop-code"></i> ONLINE CBT EXAMINATION PORTAL
+        </div>
+        <h1>TNPSC Examination</h1>
+        <div class="chips">
+            <span class="chip">Group I</span>
+            <span class="chip">Group II / IIA</span>
+            <span class="chip">Group IV</span>
+        </div>
+    </header>
+
+    <!-- Candidate Login -->
+    <form id="loginForm">
+        <div class="group">
+            <label>Candidate ID / Gmail ID</label>
+            <div class="wrap">
+                <input id="loginId" type="text" autocomplete="username"
+                       placeholder="Candidate ID or Gmail ID" required>
+                <i class="fa-regular fa-user"></i>
+            </div>
+        </div>
+
+        <div class="group">
+            <label>Password</label>
+            <div class="wrap">
+                <input id="loginPassword" type="password" autocomplete="current-password"
+                       placeholder="Enter your password" required>
+                <i class="fa-solid fa-lock"></i>
+                <button class="toggle" type="button" onclick="togglePassword('loginPassword', this)">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="loginStatus" class="status"></div>
+
+        <button class="btn primary" id="loginBtn" type="submit">
+            <i class="fa-solid fa-right-to-bracket"></i> LOGIN TO PORTAL
+        </button>
+
+        <div class="links">
+            <a href="#" onclick="openModal('forgotModal'); return false;">Forgot Password?</a>
+            <a href="#" onclick="openModal('registerModal'); return false;">New Candidate Registration</a>
+        </div>
+    </form>
+
+    <div class="footer">
+        <div class="feature">
+            <i class="fa-solid fa-circle-check"></i>Live CBT
+        </div>
+        <div class="feature">
+            <i class="fa-solid fa-clock"></i>Timed Exams
+        </div>
+        <div class="feature">
+            <i class="fa-solid fa-shield-halved"></i>Secure Access
+        </div>
+    </div>
+</main>
+
+<!-- Candidate Registration -->
+<div id="registerModal" class="modal">
+    <div class="modal-card">
+        <button class="close" onclick="closeModal('registerModal')">×</button>
+
+        <div class="title">
+            <i class="fa-solid fa-user-plus" style="color:#6ee7b7"></i>
+            Candidate Registration
+        </div>
+
+        <p class="note">
+            Enter your details and create your password. Your registration will stay pending until the Creator approves your account.
+        </p>
+
+        <div class="group">
+            <label>Full Name</label>
+            <div class="wrap">
+                <input id="regName" type="text" autocomplete="name" placeholder="Enter full name">
+                <i class="fa-regular fa-id-card"></i>
+            </div>
+        </div>
+
+        <div class="group">
+            <label>Mobile Number</label>
+            <div class="wrap">
+                <input id="regMobile" type="tel" inputmode="numeric"
+                       autocomplete="tel" maxlength="10" placeholder="10-digit mobile number">
+                <i class="fa-solid fa-mobile-screen"></i>
+            </div>
+        </div>
+
+        <div class="group">
+            <label>Gmail ID</label>
+            <div class="wrap">
+                <input id="regEmail" type="email" autocomplete="email"
+                       placeholder="example@gmail.com">
+                <i class="fa-regular fa-envelope"></i>
+            </div>
+        </div>
+
+        <div class="group">
+            <label>Create Password</label>
+            <div class="wrap">
+                <input id="regPassword" type="password" autocomplete="new-password"
+                       placeholder="Minimum 8 characters">
+                <i class="fa-solid fa-lock"></i>
+                <button class="toggle" type="button" onclick="togglePassword('regPassword', this)">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="group">
+            <label>Confirm Password</label>
+            <div class="wrap">
+                <input id="regConfirm" type="password" autocomplete="new-password"
+                       placeholder="Re-enter password">
+                <i class="fa-solid fa-lock"></i>
+                <button class="toggle" type="button" onclick="togglePassword('regConfirm', this)">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="regStatus" class="status"></div>
+
+        <button class="btn green" type="button" id="registerBtn" onclick="registerCandidate()">
+            <i class="fa-solid fa-user-plus"></i> CREATE ACCOUNT
+        </button>
+
+        <p class="note">
+            No OTP is required. After registration, the account is pending until the Creator approves it.
+        </p>
+    </div>
+</div>
+
+<!-- Password Recovery -->
+<div id="forgotModal" class="modal">
+    <div class="modal-card">
+        <button class="close" onclick="closeModal('forgotModal')">×</button>
+
+        <div class="title">
+            <i class="fa-solid fa-key" style="color:#fbbf24"></i>
+            Password Recovery
+        </div>
+
+        <div class="group">
+            <label>Registered Gmail ID</label>
+            <div class="wrap">
+                <input id="forgotEmail" type="email" autocomplete="email"
+                       placeholder="registered@gmail.com">
+                <i class="fa-regular fa-envelope"></i>
+            </div>
+        </div>
+
+        <div id="forgotStatus" class="status"></div>
+
+        <button class="btn amber" type="button" onclick="sendReset()">
+            <i class="fa-solid fa-envelope"></i> SEND RESET EMAIL
+        </button>
+
+        <p class="note">
+            The password reset email will be sent to the registered Gmail ID.
+        </p>
+    </div>
+</div>
+
+<!-- Creator Login: ID + Password only -->
+<div id="creatorModal" class="modal">
+    <div class="modal-card">
+        <button class="close" onclick="closeModal('creatorModal')">×</button>
+
+        <div class="title">
+            <i class="fa-solid fa-shield-halved" style="color:#f87171"></i>
+            Creator Access
+        </div>
+
+        <p class="note">
+            Creator access requires only the Creator ID and Password.
+        </p>
+
+        <div class="group">
+            <label>Creator ID</label>
+            <div class="wrap">
+                <input id="creatorId" type="text" autocomplete="username"
+                       placeholder="Enter Creator ID">
+                <i class="fa-regular fa-user"></i>
+            </div>
+        </div>
+
+        <div class="group">
+            <label>Creator Password</label>
+            <div class="wrap">
+                <input id="creatorPassword" type="password" autocomplete="current-password"
+                       placeholder="Enter Creator password">
+                <i class="fa-solid fa-key"></i>
+                <button class="toggle" type="button" onclick="togglePassword('creatorPassword', this)">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="creatorStatus" class="status"></div>
+
+        <button class="btn red" type="button" onclick="creatorLogin()">
+            <i class="fa-solid fa-right-to-bracket"></i> CREATOR LOGIN
+        </button>
+    </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://tbhcpmfnoohnppwnpqmk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiaGNwbWZub29obnBwd25wcW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg3OTYsImV4cCI6MjEwNDY5NDc5Nn0.990cCxnAtQ6MaisdsrSnrceLl12ne5jRUAyUEX6FcB0";
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Safe configuration check: never put a Supabase service-role/secret key in this file.
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.error("Supabase configuration is missing.");
+}
+
+
+function openModal(id) {
+    document.getElementById(id).classList.add("open");
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove("open");
+}
+
+document.querySelectorAll(".modal").forEach(modal => {
+    modal.addEventListener("click", event => {
+        if (event.target === modal) modal.classList.remove("open");
+    });
+});
+
+function togglePassword(id, button) {
+    const input = document.getElementById(id);
+    const icon = button.querySelector("i");
+    input.type = input.type === "password" ? "text" : "password";
+    icon.className = input.type === "password"
+        ? "fa-regular fa-eye"
+        : "fa-regular fa-eye-slash";
+}
+
+function showStatus(id, message, type = "err") {
+    const el = document.getElementById(id);
+    el.textContent = message;
+    el.className = "status show " + type;
+}
+
+function isGmail(value) {
+    return /^[^\s@]+@gmail\.com$/i.test(value);
+}
+
+function isStrongEnoughPassword(value) {
+    return typeof value === "string" && value.length >= 8;
+}
+
+/*
+  Candidate registration:
+  No OTP.
+  Supabase Auth creates the credential securely; the profile remains
+  pending until the Creator approves it.
+*/
+async function registerCandidate() {
+    const name = document.getElementById("regName").value.trim();
+    const mobile = document.getElementById("regMobile").value.replace(/\D/g, "");
+    const email = document.getElementById("regEmail").value.trim().toLowerCase();
+    const password = document.getElementById("regPassword").value;
+    const confirm = document.getElementById("regConfirm").value;
+    const button = document.getElementById("registerBtn");
+
+    if (!name)
+        return showStatus("regStatus", "Please enter your full name.");
+
+    if (!/^\d{10}$/.test(mobile))
+        return showStatus("regStatus", "Please enter a valid 10-digit mobile number.");
+
+    if (!isGmail(email))
+        return showStatus("regStatus", "Please enter a valid Gmail ID.");
+
+    if (!isStrongEnoughPassword(password))
+        return showStatus("regStatus", "Password must contain at least 8 characters.");
+
+    if (password !== confirm)
+        return showStatus("regStatus", "Passwords do not match.");
+
+    button.disabled = true;
+
+    try {
+        const { data, error } = await sb.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: name,
+                    mobile_number: mobile,
+                    role: "candidate"
+                }
+            }
+        });
+
+        if (error) throw error;
+
+        if (!data.user) {
+            throw new Error("Account creation could not be completed.");
+        }
+
+        /*
+          Try to create/update the candidate profile.
+          If RLS blocks this client-side write, the existing database trigger
+          or secure backend function must perform the same operation.
+        */
+        const { error: profileError } = await sb
+            .from("profiles")
+            .upsert({
+                id: data.user.id,
+                full_name: name,
+                email: email,
+                mobile: mobile,
+                role: "candidate",
+                approval_status: "pending_approval"
+            }, { onConflict: "id" });
+
+        if (profileError) {
+            console.warn("Profile update:", profileError.message);
+        }
+
+        await sb.auth.signOut();
+
+        document.getElementById("regName").value = "";
+        document.getElementById("regMobile").value = "";
+        document.getElementById("regEmail").value = "";
+        document.getElementById("regPassword").value = "";
+        document.getElementById("regConfirm").value = "";
+
+        closeModal("registerModal");
+
+        alert(
+            "Registration submitted successfully.\n\n" +
+            "Your account is now pending Creator approval.\n\n" +
+            "You can log in only after the Creator approves your account."
+        );
+
+    } catch (error) {
+        showStatus("regStatus", error.message || "Registration failed.");
+    } finally {
+        button.disabled = false;
+    }
+}
+
+/*
+  Candidate login:
+  - Gmail ID can be used directly.
+  - Candidate ID can be supported by the secure backend function
+    "candidate-login-identifier".
+  - Approval status is checked before dashboard access.
+*/
+document.getElementById("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const identifier = document.getElementById("loginId").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    if (!identifier || !password)
+        return showStatus("loginStatus", "Enter your Candidate ID/Gmail ID and password.");
+
+    try {
+        let email = identifier.toLowerCase();
+
+        if (!isGmail(email)) {
+            const { data, error } = await sb.functions.invoke(
+                "candidate-login-identifier",
+                { body: { identifier } }
+            );
+
+            if (error || !data?.email)
+                throw new Error("Candidate ID was not found.");
+
+            email = data.email;
+        }
+
+        const { data, error } = await sb.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) throw error;
+        if (!data.user) throw new Error("Login failed.");
+
+        const { data: profile, error: profileError } = await sb
+            .from("profiles")
+            .select("role, approval_status, status")
+            .eq("id", data.user.id)
+            .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        const approval = profile?.approval_status || profile?.status;
+
+        if (approval !== "approved") {
+            await sb.auth.signOut();
+
+            if (approval === "rejected")
+                return showStatus("loginStatus", "Your registration was rejected by the Creator.");
+
+            if (approval === "blocked")
+                return showStatus("loginStatus", "This account is blocked.");
+
+            return showStatus(
+                "loginStatus",
+                "Your account is waiting for Creator approval.",
+                "warn"
+            );
+        }
+
+        if (profile?.role === "creator") {
+            window.location.href = "creator.html";
+        } else {
+            window.location.href = "dashboard.html";
+        }
+
+    } catch (error) {
+        showStatus("loginStatus", error.message || "Login failed.");
+    }
+});
+
+/* Password recovery uses the registered Gmail ID. */
+async function sendReset() {
+    const email = document.getElementById("forgotEmail").value.trim().toLowerCase();
+
+    if (!isGmail(email))
+        return showStatus("forgotStatus", "Please enter your registered Gmail ID.");
+
+    try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + window.location.pathname + "#reset"
+        });
+
+        if (error) throw error;
+
+        showStatus(
+            "forgotStatus",
+            "Password reset email sent. Check your Gmail inbox and Spam folder.",
+            "ok"
+        );
+
+    } catch (error) {
+        showStatus("forgotStatus", error.message || "Unable to send reset email.");
+    }
+}
+
+/*
+  Creator login intentionally has only Creator ID + Password in the UI.
+  Secure credential verification should be performed by the creator-login
+  backend function. No creator password is stored in this HTML.
+*/
+async function creatorLogin() {
+    const creatorId = document.getElementById("creatorId").value.trim();
+    const password = document.getElementById("creatorPassword").value;
+
+    if (!creatorId || !password)
+        return showStatus("creatorStatus", "Enter Creator ID and password.");
+
+    try {
+        const { data, error } = await sb.functions.invoke("creator-login", {
+            body: {
+                identifier: creatorId,
+                password
+            }
+        });
+
+        if (error) throw error;
+
+        if (data?.role === "creator") {
+            window.location.href = "creator.html";
+            return;
+        }
+
+        throw new Error("Creator access denied.");
+
+    } catch (error) {
+        showStatus(
+            "creatorStatus",
+            error.message || "Creator login backend is not configured yet."
+        );
+    }
+}
+</script>
+
+</body>
+</html>

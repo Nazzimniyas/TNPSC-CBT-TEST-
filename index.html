@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CBT Examination Portal">
+<title>CBT Examination Portal</title>
+<style>
+:root{
+  --bg:#07111f;--panel:#10233a;--panel2:#0b1a2c;--line:#203651;
+  --text:#f8fafc;--muted:#9fb0c5;--blue:#2563eb;--green:#10b981;
+  --red:#ef4444;--amber:#f59e0b;--white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(circle at 20% 10%,#173d6b 0,#07111f 38%),var(--bg);color:var(--text);min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.topbar{height:68px;border-bottom:1px solid var(--line);background:#07111fea;backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:20}
+.brand{font-weight:800;letter-spacing:.3px}.brand small{display:block;color:#7dd3fc;font-size:10px;letter-spacing:1.5px;margin-top:2px}
+.container{width:min(1180px,calc(100% - 28px));margin:28px auto}
+.card{background:#10233af2;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 55px #0005}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{width:min(480px,100%);padding:32px}
+.center{text-align:center}
+.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:#2563eb18;border:1px solid #60a5fa38;color:#93c5fd;font-size:11px;font-weight:800;letter-spacing:.5px}
+h1{font-size:28px;margin:15px 0 8px}h2{font-size:21px;margin-bottom:16px}h3{font-size:16px}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}
+.group{margin:16px 0}.group label{display:block;font-size:12px;font-weight:700;margin-bottom:7px;color:#dbeafe}
+input,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:13px 14px;border-radius:11px;outline:none}
+input:focus,select:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #2563eb22}
+.password-wrap{position:relative}.password-wrap input{padding-right:48px}
+.eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#9fb0c5;padding:7px}
+.btn{border:0;border-radius:11px;padding:13px 16px;font-weight:800;color:white;width:100%;margin-top:6px}
+.blue{background:var(--blue)}.green{background:var(--green)}.red{background:var(--red)}.amber{background:var(--amber);color:#17110a}
+.btn.secondary{background:#162d48;border:1px solid var(--line)}
+.links{display:flex;justify-content:space-between;gap:10px;margin-top:17px}.link{background:none;border:0;color:#93c5fd;font-size:12px}
+.status{padding:10px 12px;border-radius:10px;font-size:12px;margin:10px 0;display:none}.status.show{display:block}.status.ok{background:#10b98118;color:#a7f3d0;border:1px solid #10b98140}.status.err{background:#ef444418;color:#fecaca;border:1px solid #ef444440}.status.warn{background:#f59e0b18;color:#fde68a;border:1px solid #f59e0b40}
+.creator-access{position:fixed;left:12px;top:12px;width:34px;height:34px;border-radius:50%;border:1px solid #ffffff12;background:#ffffff06;color:#9fb0c4;opacity:.22;z-index:100}.creator-access:hover{opacity:.9}
+.modal{position:fixed;inset:0;background:#020617df;backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:15px;z-index:90}.modal.open{display:flex}.modal-box{width:min(500px,100%);max-height:92vh;overflow:auto;padding:26px;border-radius:19px;background:var(--panel);border:1px solid var(--line);position:relative}.close{position:absolute;right:12px;top:9px;border:0;background:none;color:#a5b4c7;font-size:24px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tab{border:1px solid var(--line);background:#0c1d31;color:#a9bad0;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.stat{padding:18px;border-radius:15px;background:#0b1b2e;border:1px solid var(--line)}.stat b{display:block;font-size:25px;margin-top:5px}.stat span{font-size:11px;color:var(--muted)}
+.section{padding:20px;margin-bottom:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions .btn{width:auto;margin:0;padding:9px 12px;font-size:11px}
+.test-card{padding:18px;background:#0b1b2e;border:1px solid var(--line);border-radius:15px}.test-card+.test-card{margin-top:10px}.test-meta{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}.tag{font-size:10px;padding:4px 7px;border-radius:6px;background:#ffffff08;color:#cbd5e1;border:1px solid #ffffff10}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left}th{color:#93c5fd;font-size:10px;text-transform:uppercase}
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+.header-actions{display:flex;align-items:center;gap:10px}.logout{border:1px solid var(--line);background:#0c1d31;color:#fff;border-radius:9px;padding:8px 12px;font-size:11px}
+.profile-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.profile-item{background:#0b1b2e;border:1px solid var(--line);border-radius:12px;padding:12px}.profile-item small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.profile-item b{font-size:13px}
+@media(max-width:760px){.grid,.grid2,.profile-list{grid-template-columns:1fr}.topbar{padding:0 14px}.container{width:min(100% - 18px,1180px)}.login-card{padding:25px 19px}.links{flex-direction:column;text-align:center}.section{padding:15px}table{display:block;overflow:auto;white-space:nowrap}}
+</style>
+</head>
+<body>
+
+<button class="creator-access" title="Creator Access" aria-label="Creator Access" onclick="openModal('creatorModal')">⚙</button>
+
+<div id="loginPage" class="login-page">
+  <div class="card login-card">
+    <div class="center">
+      <span class="badge">ONLINE CBT EXAMINATION PORTAL</span>
+      <h1>TNPSC Examination</h1>
+      <p class="muted">Group I · Group II / IIA · Group IV</p>
+    </div>
+    <form id="loginForm">
+      <div class="group"><label>Candidate ID / Email / Mobile</label><input id="loginId" autocomplete="username" placeholder="Enter ID, mobile or Email" required></div>
+      <div class="group"><label>Password</label><div class="password-wrap"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password" required><button class="eye" type="button" onclick="togglePassword('loginPassword',this)">👁</button></div></div>
+      <div id="loginStatus" class="status"></div>
+      <button class="btn blue" type="submit">LOGIN TO PORTAL</button>
+      <div class="links"><button class="link" type="button" onclick="openModal('forgotModal')">Forgot Password?</button><button class="link" type="button" onclick="openModal('registerModal')">New Candidate Registration</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="brand">TNPSC CBT <small>EXAMINATION PORTAL</small></div>
+    <div class="header-actions"><span id="topUser" class="muted"></span><button class="logout" onclick="logout()">Logout</button></div>
+  </div>
+  <main class="container">
+    <div id="candidateView" class="hidden">
+      <div class="section card">
+        <div class="section-head"><div><h2>Candidate Dashboard</h2><p class="muted">Your profile, tests and results.</p></div></div>
+        <div id="candidateProfile" class="profile-list"></div>
+      </div>
+      <div class="grid" id="candidateStats"></div>
+      <div class="section card">
+        <div class="section-head"><h2>Available Tests</h2></div>
+        <div id="availableTests"></div>
+      </div>
+      <div class="section card">
+        <div class="section-head"><h2>My Test History</h2></div>
+        <div id="myHistory"></div>
+      </div>
+      <div class="section card">
+        <div class="section-head"><h2>Ranking</h2><div class="tabs"><button class="tab active" onclick="showCandidateRank('overall',this)">Overall</button><button class="tab" onclick="showCandidateRank('test',this)">Individual Test</button></div></div>
+        <div id="candidateRanking"></div>
+      </div>
+    </div>
+
+    <div id="creatorView" class="hidden">
+      <div class="section card">
+        <div class="section-head"><div><h2>Creator / Admin Dashboard</h2><p class="muted">Control candidates, tests, results and rankings.</p></div></div>
+        <div class="grid" id="adminStats"></div>
+      </div>
+      <div class="section card">
+        <div class="tabs">
+          <button class="tab active" onclick="adminTab('pending',this)">Pending Candidates</button>
+          <button class="tab" onclick="adminTab('tests',this)">Tests</button>
+          <button class="tab" onclick="adminTab('results',this)">Results</button>
+          <button class="tab" onclick="adminTab('ranking',this)">Ranking</button>
+          <button class="tab" onclick="adminTab('candidates',this)">Candidates</button>
+        </div>
+        <div id="adminContent"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="registerModal" class="modal"><div class="modal-box">
+<button class="close" onclick="closeModal('registerModal')">×</button><h2>New Candidate Registration</h2><p class="muted">After registration, your account remains pending until the Creator approves it. First-time activation requires approval; later logins do not.</p>
+<div class="group"><label>Full Name</label><input id="regName" placeholder="Full name"></div>
+<div class="group"><label>Mobile Number</label><input id="regMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile"></div>
+<div class="group"><label>Email ID</label><input id="regEmail" type="email" placeholder="Email address"></div>
+<div class="group"><label>Password</label><div class="password-wrap"><input id="regPassword" type="password" placeholder="Minimum 8 characters"><button class="eye" type="button" onclick="togglePassword('regPassword',this)">👁</button></div></div>
+<div class="group"><label>Confirm Password</label><div class="password-wrap"><input id="regConfirm" type="password" placeholder="Confirm password"><button class="eye" type="button" onclick="togglePassword('regConfirm',this)">👁</button></div></div>
+<div id="regStatus" class="status"></div><button class="btn green" onclick="registerCandidate()">CREATE ACCOUNT</button>
+</div></div>
+
+<div id="forgotModal" class="modal"><div class="modal-box">
+<button class="close" onclick="closeModal('forgotModal')">×</button><h2>Forgot Password</h2><p class="muted">Enter the registered mobile number and email. If both match, you can create a new password.</p>
+<div class="group"><label>Mobile Number</label><input id="forgotMobile" inputmode="numeric" maxlength="10" placeholder="Registered mobile"></div>
+<div class="group"><label>Email ID</label><input id="forgotEmail" type="email" placeholder="Registered email"></div>
+<div id="forgotStatus" class="status"></div><button class="btn amber" onclick="verifyForgot()">VERIFY & CONTINUE</button>
+<div id="newPasswordArea" class="hidden"><div class="group"><label>New Password</label><div class="password-wrap"><input id="newPassword" type="password"><button class="eye" type="button" onclick="togglePassword('newPassword',this)">👁</button></div></div><div class="group"><label>Confirm New Password</label><div class="password-wrap"><input id="newConfirm" type="password"><button class="eye" type="button" onclick="togglePassword('newConfirm',this)">👁</button></div></div><button class="btn green" onclick="resetPassword()">SET NEW PASSWORD</button></div>
+</div></div>
+
+<div id="creatorModal" class="modal"><div class="modal-box">
+<button class="close" onclick="closeModal('creatorModal')">×</button><h2>Creator Access</h2><p class="muted">Creator login is separate from candidate login.</p>
+<div class="group"><label>Creator ID</label><input id="creatorId" autocomplete="off" placeholder="Creator ID"></div>
+<div class="group"><label>Creator Password</label><div class="password-wrap"><input id="creatorPassword" type="password" autocomplete="new-password" placeholder="Creator password"><button class="eye" type="button" onclick="togglePassword('creatorPassword',this)">👁</button></div></div>
+<div id="creatorStatus" class="status"></div><button class="btn red" onclick="creatorLogin()">CREATOR LOGIN</button>
+</div></div>
+
+<div id="testModal" class="modal"><div class="modal-box">
+<button class="close" onclick="closeModal('testModal')">×</button><h2 id="testModalTitle">Add Test</h2>
+<div class="group"><label>Subject</label><input id="testSubject" placeholder="Economics"></div>
+<div class="grid2"><div class="group"><label>Standard</label><select id="testStandard"><option>11th Standard</option><option>12th Standard</option></select></div><div class="group"><label>Unit</label><input id="testUnit" placeholder="Unit 2 - National Income"></div></div>
+<div class="group"><label>Test HTML file / path</label><input id="testFile" placeholder="example: tests/economics-unit2.html"></div>
+<p class="muted">GitHub-ல் தனியாக upload செய்யும் test HTML-ன் relative path இங்கே கொடுக்கலாம். Start Test அழுத்தும்போது அந்த HTML open ஆகும்.</p>
+<div id="testStatus" class="status"></div><button class="btn green" onclick="saveTest()">SAVE TEST</button>
+</div></div>
+
+<script>
+/*
+  IMPORTANT:
+  This is a GitHub-only / browser-local version.
+  No Supabase, API key, external database or backend is used. Email/SMS OTP and Creator approval notifications cannot be sent by pure HTML/localStorage.
+  Data is stored in this browser's localStorage.
+  For a real multi-device public exam system, a secure backend/database is required.
+
+  CHANGE THESE TWO VALUES before publishing if desired.
+*/
+const CREATOR_ID = "Nazzim";
+const CREATOR_PASSWORD = "Dude/28@";
+
+const DBKEY = "tnpsc_cbt_portal_v1";
+let state = loadState();
+let currentUser = null;
+let editingTestId = null;
+let forgotUserId = null;
+let rankMode = "overall";
+
+function defaultState(){
+  return {
+    candidates: [],
+    tests: [
+      {id:"583214",subject:"Economics",standard:"12th Standard",unit:"Unit 2 - National Income",file:"tests/economics-unit2.html",active:true}
+    ],
+    results:[]
+  };
+}
+function loadState(){
+  try{return JSON.parse(localStorage.getItem(DBKEY)) || defaultState()}catch(e){return defaultState()}
+}
+function saveState(){localStorage.setItem(DBKEY,JSON.stringify(state))}
+function uid(prefix){
+  if(prefix==="test"){
+    let id;
+    do{
+      id=String(Math.floor(100000+Math.random()*900000));
+    }while(state.tests.some(t=>String(t.id)===id));
+    return id;
+  }
+  return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7);
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function openModal(id){document.getElementById(id).classList.add("open")}
+function closeModal(id){document.getElementById(id).classList.remove("open")}
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}))
+function togglePassword(id,btn){const i=document.getElementById(id);i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"🙈":"👁"}
+function status(id,msg,type="err"){const e=document.getElementById(id);e.textContent=msg;e.className="status show "+type}
+function clearStatus(id){const e=document.getElementById(id);e.className="status"}
+function normalize(v){return String(v||"").trim().toLowerCase()}
+
+
+async function hashPassword(value){
+  const data=new TextEncoder().encode(value);
+  const hash=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function passwordMatches(stored, entered){
+  if(typeof stored==="string" && stored.startsWith("sha256:")){
+    return stored==="sha256:"+await hashPassword(entered);
+  }
+  return stored===entered; // backward compatibility with existing local data
+}
+async function storePassword(value){return "sha256:"+await hashPassword(value)}
+function saveSession(){
+  if(currentUser?.role==="creator") sessionStorage.setItem("cbtSession",JSON.stringify({role:"creator"}));
+  else if(currentUser) sessionStorage.setItem("cbtSession",JSON.stringify({role:"candidate",id:currentUser.id}));
+}
+function restoreSession(){
+  try{
+    const s=JSON.parse(sessionStorage.getItem("cbtSession")||"null");
+    if(!s)return;
+    if(s.role==="creator"){currentUser={role:"creator",name:"Creator"};showCreator();return;}
+    if(s.role==="candidate"){
+      const c=state.candidates.find(x=>x.id===s.id);
+      if(c && c.approval==="approved"){currentUser=c;showCandidate();}
+    }
+  }catch(e){}
+}
+
+async function registerCandidate(){
+  const name=document.getElementById("regName").value.trim();
+  const mobile=document.getElementById("regMobile").value.replace(/\D/g,"");
+  const email=normalize(document.getElementById("regEmail").value);
+  const pass=document.getElementById("regPassword").value;
+  const confirm=document.getElementById("regConfirm").value;
+  if(!name)return status("regStatus","Enter your full name.");
+  if(!/^\d{10}$/.test(mobile))return status("regStatus","Enter a valid 10-digit mobile number.");
+  if(!email.includes("@"))return status("regStatus","Enter a valid email ID.");
+  if(pass.length<8)return status("regStatus","Password must contain at least 8 characters.");
+  if(pass!==confirm)return status("regStatus","Passwords do not match.");
+  if(state.candidates.some(c=>normalize(c.email)===email))return status("regStatus","This email is already registered.");
+  if(state.candidates.some(c=>c.mobile===mobile))return status("regStatus","This mobile number is already registered.");
+  const candidate={id:uid("cand"),name,mobile,email,password:await storePassword(pass),approval:"pending",createdAt:new Date().toISOString()};
+  state.candidates.push(candidate);saveState();
+  document.getElementById("regName").value=document.getElementById("regMobile").value=document.getElementById("regEmail").value=document.getElementById("regPassword").value=document.getElementById("regConfirm").value="";
+  closeModal("registerModal");
+  alert("Registration submitted.\n\nYour account is pending Creator approval.");
+}
+document.getElementById("loginForm").addEventListener("submit",async function(e){
+  e.preventDefault();
+  const id=normalize(document.getElementById("loginId").value),pass=document.getElementById("loginPassword").value;
+  const c=state.candidates.find(x=>normalize(x.email)===id||normalize(x.mobile)===id||normalize(x.id)===id);
+  if(!c)return status("loginStatus","Candidate account was not found.");
+  if(!(await passwordMatches(c.password,pass)))return status("loginStatus","Incorrect password.");
+  if(c.approval==="pending")return status("loginStatus","Your account is waiting for Creator approval.","warn");
+  if(c.approval==="rejected")return status("loginStatus","Your registration was rejected by the Creator.");
+  if(c.approval==="blocked")return status("loginStatus","This account is blocked.");
+  currentUser=c; saveSession(); showCandidate();
+});
+function creatorLogin(){
+  const id=document.getElementById("creatorId").value.trim(),pass=document.getElementById("creatorPassword").value;
+  if(id!==CREATOR_ID||pass!==CREATOR_PASSWORD)return status("creatorStatus","Invalid Creator ID or password.");
+  currentUser={role:"creator",name:"Creator"};document.getElementById("creatorId").value="";document.getElementById("creatorPassword").value="";saveSession();closeModal("creatorModal");showCreator();
+}
+function showApp(){document.getElementById("loginPage").classList.add("hidden");document.getElementById("app").classList.remove("hidden")}
+function showCandidate(){
+  showApp();document.getElementById("candidateView").classList.remove("hidden");document.getElementById("creatorView").classList.add("hidden");
+  document.getElementById("topUser").textContent=currentUser.name;renderCandidate();
+}
+function showCreator(){
+  showApp();document.getElementById("creatorView").classList.remove("hidden");document.getElementById("candidateView").classList.add("hidden");
+  document.getElementById("topUser").textContent="Creator";renderAdmin("pending");
+}
+function logout(){currentUser=null;sessionStorage.removeItem("cbtSession");document.getElementById("creatorId").value="";document.getElementById("creatorPassword").value="";document.getElementById("app").classList.add("hidden");document.getElementById("loginPage").classList.remove("hidden");document.getElementById("loginForm").reset()}
+function renderCandidate(){
+  const c=currentUser;
+  document.getElementById("candidateProfile").innerHTML=`
+    <div class="profile-item"><small>Name</small><b>${esc(c.name)}</b></div>
+    <div class="profile-item"><small>Candidate ID</small><b>${esc(c.id)}</b></div>
+    <div class="profile-item"><small>Mobile</small><b>${esc(c.mobile)}</b></div>
+    <div class="profile-item"><small>Email</small><b>${esc(c.email)}</b></div>`;
+  const mine=state.results.filter(r=>r.candidateId===c.id);
+  document.getElementById("candidateStats").innerHTML=`
+    <div class="stat"><span>Tests Completed</span><b>${mine.length}</b></div>
+    <div class="stat"><span>Available Tests</span><b>${state.tests.filter(t=>t.active).length}</b></div>
+    <div class="stat"><span>Best Score</span><b>${mine.length?Math.max(...mine.map(r=>r.score)):0}</b></div>`;
+  const tests=state.tests.filter(t=>t.active);
+  document.getElementById("availableTests").innerHTML=tests.length?tests.map(t=>`
+    <div class="test-card"><h3>${esc(t.subject)}</h3><div class="test-meta"><span class="tag">${esc(t.standard)}</span><span class="tag">${esc(t.unit)}</span></div>
+    <button class="btn blue" onclick="startTest('${t.id}')">START TEST</button></div>`).join(""):`<div class="empty">No tests available.</div>`;
+  document.getElementById("myHistory").innerHTML=mine.length?`<table><thead><tr><th>Test</th><th>Score</th><th>Accuracy</th><th>Time</th></tr></thead><tbody>${mine.slice().reverse().map(r=>`<tr><td>${esc(r.testName)}</td><td>${r.score}</td><td>${r.accuracy}%</td><td>${esc(r.time)}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">You have not completed any test yet.</div>`;
+  renderCandidateRanking();
+}
+function startTest(id){
+  const t=state.tests.find(x=>x.id===id);if(!t)return;
+  if(!t.file){alert("This test has no HTML file/path yet.");return}
+  /*
+    The test itself remains a separate HTML file in GitHub.
+    Example: tests/economics-unit2.html
+    After the test finishes, that test page should call:
+    parent.postMessage({type:"CBT_RESULT",testId:"...",score:25,accuracy:83.33,time:"18:20"},"*")
+    when it is embedded. For direct navigation, use the return URL below.
+  */
+  const returnUrl=location.href.split("#")[0]+"#return="+encodeURIComponent(t.id);
+  sessionStorage.setItem("cbtReturn",returnUrl);
+  location.href=t.file;
+}
+function renderCandidateRanking(){
+  const rows=state.results.slice().sort((a,b)=>b.score-a.score);
+  document.getElementById("candidateRanking").innerHTML=rows.length?`<table><thead><tr><th>Rank</th><th>Candidate</th><th>Test</th><th>Score</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.candidateName)}</td><td>${esc(r.testName)}</td><td>${r.score}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">Ranking will appear after tests are completed.</div>`;
+}
+function showCandidateRank(mode,btn){rankMode=mode;document.querySelectorAll("#candidateView .tab").forEach(x=>x.classList.remove("active"));btn.classList.add("active");renderCandidateRanking()}
+function adminTab(tab,btn){document.querySelectorAll("#creatorView .tab").forEach(x=>x.classList.remove("active"));btn.classList.add("active");renderAdmin(tab)}
+function renderAdmin(tab){
+  document.getElementById("adminStats").innerHTML=`
+    <div class="stat"><span>Total Candidates</span><b>${state.candidates.length}</b></div>
+    <div class="stat"><span>Pending Approval</span><b>${state.candidates.filter(c=>c.approval==="pending").length}</b></div>
+    <div class="stat"><span>Total Results</span><b>${state.results.length}</b></div>`;
+  const box=document.getElementById("adminContent");
+  if(tab==="pending")box.innerHTML=pendingHTML();
+  if(tab==="tests")box.innerHTML=testsAdminHTML();
+  if(tab==="results")box.innerHTML=resultsAdminHTML();
+  if(tab==="ranking")box.innerHTML=rankingAdminHTML();
+  if(tab==="candidates")box.innerHTML=candidatesAdminHTML();
+}
+function pendingHTML(){
+  const p=state.candidates.filter(c=>c.approval==="pending");
+  return p.length?`<table><thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Action</th></tr></thead><tbody>${p.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.mobile)}</td><td>${esc(c.email)}</td><td><div class="actions"><button class="btn green" onclick="approve('${c.id}')">Approve</button><button class="btn red" onclick="reject('${c.id}')">Reject</button></div></td></tr>`).join("")}</tbody></table>`:`<div class="empty">No pending candidates.</div>`;
+}
+function approve(id){const c=state.candidates.find(x=>x.id===id);if(c){c.approval="approved";saveState();renderAdmin("pending")}}
+function reject(id){const c=state.candidates.find(x=>x.id===id);if(c){c.approval="rejected";saveState();renderAdmin("pending")}}
+function testsAdminHTML(){
+  return `<div class="section-head"><h3>Manage Tests</h3><div class="actions"><button class="btn green" onclick="openAddTest()">+ Add Test</button></div></div>`+
+  (state.tests.length?state.tests.map(t=>`<div class="test-card"><h3>${esc(t.subject)}</h3><div class="test-meta"><span class="tag">${esc(t.standard)}</span><span class="tag">${esc(t.unit)}</span><span class="tag">${t.active?"Active":"Hidden"}</span></div><p class="muted">${esc(t.file)}</p><div class="actions" style="margin-top:12px"><button class="btn blue" onclick="openEditTest('${t.id}')">Edit</button><button class="btn secondary" onclick="toggleTest('${t.id}')">${t.active?"Hide":"Show"}</button><button class="btn red" onclick="deleteTest('${t.id}')">Delete</button></div></div>`).join(""):`<div class="empty">No tests added.</div>`);
+}
+function openAddTest(){editingTestId=null;document.getElementById("testModalTitle").textContent="Add Test";["testSubject","testUnit","testFile"].forEach(x=>document.getElementById(x).value="");document.getElementById("testStandard").value="12th Standard";openModal("testModal")}
+function openEditTest(id){const t=state.tests.find(x=>x.id===id);if(!t)return;editingTestId=id;document.getElementById("testModalTitle").textContent="Edit Test";document.getElementById("testSubject").value=t.subject;document.getElementById("testStandard").value=t.standard;document.getElementById("testUnit").value=t.unit;document.getElementById("testFile").value=t.file;openModal("testModal")}
+function saveTest(){
+  const subject=document.getElementById("testSubject").value.trim(),standard=document.getElementById("testStandard").value,unit=document.getElementById("testUnit").value.trim(),file=document.getElementById("testFile").value.trim();
+  if(!subject||!unit||!file)return status("testStatus","Subject, standard, unit and test HTML path are required.");
+  if(editingTestId){const t=state.tests.find(x=>x.id===editingTestId);Object.assign(t,{subject,standard,unit,file})}else state.tests.push({id:uid("test"),subject,standard,unit,file,active:true});
+  saveState();closeModal("testModal");renderAdmin("tests");
+}
+function toggleTest(id){const t=state.tests.find(x=>x.id===id);if(t){t.active=!t.active;saveState();renderAdmin("tests")}}
+function deleteTest(id){if(!confirm("Delete this test?"))return;state.tests=state.tests.filter(t=>t.id!==id);saveState();renderAdmin("tests")}
+function resultsAdminHTML(){
+  return state.results.length?`<table><thead><tr><th>Candidate</th><th>Mobile</th><th>Email</th><th>Test</th><th>Score</th><th>Accuracy</th><th>Time</th></tr></thead><tbody>${state.results.slice().reverse().map(r=>{const c=state.candidates.find(x=>x.id===r.candidateId);return `<tr><td>${esc(r.candidateName)}</td><td>${esc(c?.mobile||"")}</td><td>${esc(c?.email||"")}</td><td>${esc(r.testName)}</td><td>${r.score}</td><td>${r.accuracy}%</td><td>${esc(r.time)}</td></tr>`}).join("")}</tbody></table>`:`<div class="empty">No results yet.</div>`;
+}
+function rankingAdminHTML(){
+  const rows=state.results.slice().sort((a,b)=>b.score-a.score);
+  return rows.length?`<table><thead><tr><th>Rank</th><th>Candidate</th><th>Test</th><th>Score</th><th>Accuracy</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.candidateName)}</td><td>${esc(r.testName)}</td><td>${r.score}</td><td>${r.accuracy}%</td></tr>`).join("")}</tbody></table>`:`<div class="empty">No ranking data yet.</div>`;
+}
+function candidatesAdminHTML(){
+  return state.candidates.length?`<table><thead><tr><th>Name</th><th>ID</th><th>Mobile</th><th>Email</th><th>Status</th><th>Tests</th><th>Action</th></tr></thead><tbody>${state.candidates.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.id)}</td><td>${esc(c.mobile)}</td><td>${esc(c.email)}</td><td>${esc(c.approval)}</td><td>${state.results.filter(r=>r.candidateId===c.id).length}</td><td><button class="btn ${c.approval==="blocked"?"green":"red"}" onclick="toggleBlock('${c.id}')">${c.approval==="blocked"?"Unblock":"Block"}</button></td></tr>`).join("")}</tbody></table>`:`<div class="empty">No candidates.</div>`;
+}
+function toggleBlock(id){const c=state.candidates.find(x=>x.id===id);if(c){c.approval=c.approval==="blocked"?"approved":"blocked";saveState();renderAdmin("candidates")}}
+function verifyForgot(){
+  const mobile=document.getElementById("forgotMobile").value.replace(/\D/g,""),email=normalize(document.getElementById("forgotEmail").value);
+  const c=state.candidates.find(x=>x.mobile===mobile&&normalize(x.email)===email);
+  if(!c)return status("forgotStatus","Mobile number and email do not match a registered account.");
+  if(c.approval==="blocked")return status("forgotStatus","This account is blocked.");
+  forgotUserId=c.id;document.getElementById("newPasswordArea").classList.remove("hidden");status("forgotStatus","Verified. Create your new password.","ok");
+}
+function resetPassword(){
+  const p=document.getElementById("newPassword").value,q=document.getElementById("newConfirm").value,c=state.candidates.find(x=>x.id===forgotUserId);
+  if(!c)return status("forgotStatus","Verification expired. Please try again.");
+  if(p.length<8)return status("forgotStatus","New password must contain at least 8 characters.");
+  if(p!==q)return status("forgotStatus","Passwords do not match.");
+  storePassword(p).then(h=>{c.password=h;saveState();forgotUserId=null;document.getElementById("newPasswordArea").classList.add("hidden");document.getElementById("forgotMobile").value=document.getElementById("forgotEmail").value="";status("forgotStatus","Password changed successfully. You can now log in.","ok");});return;forgotUserId=null;document.getElementById("newPasswordArea").classList.add("hidden");document.getElementById("forgotMobile").value=document.getElementById("forgotEmail").value="";status("forgotStatus","Password changed successfully. You can now log in.","ok");
+}
+
+/* Result return support for separately uploaded test HTML files.
+   A test can redirect back with:
+   index.html#result=<testId>&score=25&accuracy=83.33&time=18%3A20
+*/
+restoreSession();
+function checkReturnResult(){
+  const hash=location.hash;
+  if(!hash.startsWith("#result="))return;
+  const p=new URLSearchParams(hash.slice(1)),testId=p.get("result"),score=Number(p.get("score")),accuracy=Number(p.get("accuracy")),time=p.get("time")||"";
+  if(!currentUser||currentUser.role==="creator")return;
+  const t=state.tests.find(x=>x.id===testId);if(!t||!Number.isFinite(score))return;
+  state.results.push({id:uid("res"),candidateId:currentUser.id,candidateName:currentUser.name,testId, testName:`${t.subject} - ${t.unit}`,score,accuracy:Number.isFinite(accuracy)?accuracy:0,time,createdAt:new Date().toISOString()});
+  saveState();history.replaceState(null,"",location.pathname+location.search);renderCandidate();
+}
+window.addEventListener("load",()=>{checkReturnResult()});
+window.addEventListener("storage",()=>{state=loadState();if(currentUser?.role==="creator")renderAdmin("pending");else if(currentUser)renderCandidate()});
+</script>
+</body>
+</html>

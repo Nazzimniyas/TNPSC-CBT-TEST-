@@ -174,7 +174,7 @@ function defaultState(){
   return {
     candidates: [],
     tests: [
-      {id:"10000001",subject:"Economics",standard:"12th Standard",unit:"Unit 2 - National Income",file:"tests/economics-unit2.html",active:true}
+      {id:"demo-economics-12-u2",subject:"Economics",standard:"12th Standard",unit:"Unit 2 - National Income",file:"tests/economics-unit2.html",active:true}
     ],
     results:[]
   };
@@ -185,29 +185,13 @@ function loadState(){
 function saveState(){localStorage.setItem(DBKEY,JSON.stringify(state))}
 function uid(prefix){
   if(prefix==="test"){
-    const nums=state.tests
-      .map(t=>String(t.id||"").match(/^\d{8}$/)?.[0])
-      .filter(Boolean)
-      .map(Number);
-    const next=(nums.length?Math.max(...nums)+1:10000001);
-    return String(next).padStart(8,"0");
+    let id;
+    do{
+      id=String(Math.floor(100000+Math.random()*900000));
+    }while(state.tests.some(t=>String(t.id)===id));
+    return id;
   }
   return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7);
-}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function openModal(id){document.getElementById(id).classList.add("open")}
-function closeModal(id){document.getElementById(id).classList.remove("open")}
-document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}))
-function togglePassword(id,btn){const i=document.getElementById(id);i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"🙈":"👁"}
-function status(id,msg,type="err"){const e=document.getElementById(id);e.textContent=msg;e.className="status show "+type}
-function clearStatus(id){const e=document.getElementById(id);e.className="status"}
-function normalize(v){return String(v||"").trim().toLowerCase()}
-
-
-async function hashPassword(value){
-  const data=new TextEncoder().encode(value);
-  const hash=await crypto.subtle.digest("SHA-256",data);
-  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 async function passwordMatches(stored, entered){
   if(typeof stored==="string" && stored.startsWith("sha256:")){
@@ -306,12 +290,17 @@ function startTest(id){
     parent.postMessage({type:"CBT_RESULT",testId:"...",score:25,accuracy:83.33,time:"18:20"},"*")
     when it is embedded. For direct navigation, use the return URL below.
   */
-  const returnUrl=location.href.split("#")[0]+"#return="+encodeURIComponent(t.id);
+  const returnUrl=location.href.split("#")[0]+"#result="+encodeURIComponent(t.id);
   sessionStorage.setItem("cbtReturn",returnUrl);
   location.href=t.file;
 }
 function renderCandidateRanking(){
-  const rows=state.results.slice().sort((a,b)=>b.score-a.score);
+  let rows=state.results.slice();
+  if(rankMode==="test"){
+    const latest=rows.length?rows[rows.length-1].testId:null;
+    if(latest) rows=rows.filter(r=>r.testId===latest);
+  }
+  rows.sort((a,b)=>b.score-a.score);
   document.getElementById("candidateRanking").innerHTML=rows.length?`<table><thead><tr><th>Rank</th><th>Candidate</th><th>Test</th><th>Score</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.candidateName)}</td><td>${esc(r.testName)}</td><td>${r.score}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">Ranking will appear after tests are completed.</div>`;
 }
 function showCandidateRank(mode,btn){rankMode=mode;document.querySelectorAll("#candidateView .tab").forEach(x=>x.classList.remove("active"));btn.classList.add("active");renderCandidateRanking()}
@@ -371,7 +360,17 @@ function resetPassword(){
   if(!c)return status("forgotStatus","Verification expired. Please try again.");
   if(p.length<8)return status("forgotStatus","New password must contain at least 8 characters.");
   if(p!==q)return status("forgotStatus","Passwords do not match.");
-  storePassword(p).then(h=>{c.password=h;saveState();forgotUserId=null;document.getElementById("newPasswordArea").classList.add("hidden");document.getElementById("forgotMobile").value=document.getElementById("forgotEmail").value="";status("forgotStatus","Password changed successfully. You can now log in.","ok");});return;forgotUserId=null;document.getElementById("newPasswordArea").classList.add("hidden");document.getElementById("forgotMobile").value=document.getElementById("forgotEmail").value="";status("forgotStatus","Password changed successfully. You can now log in.","ok");
+  storePassword(p).then(h=>{
+    c.password=h;
+    saveState();
+    forgotUserId=null;
+    document.getElementById("newPasswordArea").classList.add("hidden");
+    document.getElementById("forgotMobile").value="";
+    document.getElementById("forgotEmail").value="";
+    document.getElementById("newPassword").value="";
+    document.getElementById("newConfirm").value="";
+    status("forgotStatus","Password changed successfully. You can now log in.","ok");
+  });
 }
 
 /* Result return support for separately uploaded test HTML files.

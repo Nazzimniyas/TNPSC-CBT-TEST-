@@ -144,7 +144,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:11px 8px;
 <div id="testModal" class="modal"><div class="modal-box">
 <button class="close" onclick="closeModal('testModal')">×</button><h2 id="testModalTitle">Add Test</h2>
 <div class="group"><label>Subject</label><input id="testSubject" placeholder="Economics"></div>
-<div class="grid2"><div class="group"><label>Standard</label><select id="testStandard"><option>11th Standard</option><option>12th Standard</option></select></div><div class="group"><label>Unit</label><input id="testUnit" placeholder="Unit 2 - National Income"></div></div>
+<div class="grid2"><div class="group"><label>Standard</label><input id="testStandard" placeholder="12th Standard"></div><div class="group"><label>Unit</label><input id="testUnit" placeholder="Unit 2 - National Income"></div></div>
 <div class="group"><label>Test HTML file / path</label><input id="testFile" placeholder="example: tests/economics-unit2.html"></div>
 <p class="muted">GitHub-ல் தனியாக upload செய்யும் test HTML-ன் relative path இங்கே கொடுக்கலாம். Start Test அழுத்தும்போது அந்த HTML open ஆகும்.</p>
 <div id="testStatus" class="status"></div><button class="btn green" onclick="saveTest()">SAVE TEST</button>
@@ -213,7 +213,7 @@ async function passwordMatches(stored, entered){
   if(typeof stored==="string" && stored.startsWith("sha256:")){
     return stored==="sha256:"+await hashPassword(entered);
   }
-  return stored===entered;
+  return stored===entered; // backward compatibility with existing local data
 }
 async function storePassword(value){return "sha256:"+await hashPassword(value)}
 function saveSession(){
@@ -349,7 +349,13 @@ function saveTest(){
 function toggleTest(id){const t=state.tests.find(x=>x.id===id);if(t){t.active=!t.active;saveState();renderAdmin("tests")}}
 function deleteTest(id){if(!confirm("Delete this test?"))return;state.tests=state.tests.filter(t=>t.id!==id);saveState();renderAdmin("tests")}
 function resultsAdminHTML(){
-  return state.results.length?`<table><thead><tr><th>Candidate</th><th>Mobile</th><th>Email</th><th>Test</th><th>Score</th><th>Accuracy</th><th>Time</th></tr></thead><tbody>${state.results.slice().reverse().map(r=>{const c=state.candidates.find(x=>x.id===r.candidateId);return `<tr><td>${esc(r.candidateName)}</td><td>${esc(c?.mobile||"")}</td><td>${esc(c?.email||"")}</td><td>${esc(r.testName)}</td><td>${r.score}</td><td>${r.accuracy}%</td><td>${esc(r.time)}</td></tr>`}).join("")}</tbody></table>`:`<div class="empty">No results yet.</div>`;
+  return state.results.length?`<table><thead><tr><th>Candidate</th><th>Mobile</th><th>Email</th><th>Test</th><th>Score</th><th>Accuracy</th><th>Time</th><th>Action</th></tr></thead><tbody>${state.results.slice().reverse().map(r=>{const c=state.candidates.find(x=>x.id===r.candidateId);return `<tr><td>${esc(r.candidateName)}</td><td>${esc(c?.mobile||"")}</td><td>${esc(c?.email||"")}</td><td>${esc(r.testName)}</td><td>${r.score}</td><td>${r.accuracy}%</td><td>${esc(r.time)}</td><td><button class="btn red" onclick="deleteResult('${r.id}')">Delete</button></td></tr>`}).join("")}</tbody></table>`:`<div class="empty">No results yet.</div>`;
+}
+function deleteResult(id){
+  if(!confirm("Delete this candidate test result?"))return;
+  state.results=state.results.filter(r=>r.id!==id);
+  saveState();
+  renderAdmin("results");
 }
 function rankingAdminHTML(){
   const rows=state.results.slice().sort((a,b)=>b.score-a.score);

@@ -192,12 +192,7 @@ function uid(prefix){
     const next=(nums.length?Math.max(...nums)+1:10000001);
     return String(next).padStart(8,"0");
   }
-  const nums=state.candidates
-    .map(c=>String(c.id||"").match(/^TNPSC26(\d{4})$/)?.[1])
-    .filter(Boolean)
-    .map(Number);
-  const next=(nums.length?Math.max(...nums)+1:1);
-  return "TNPSC26"+String(next).padStart(4,"0");
+  return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7);
 }
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function openModal(id){document.getElementById(id).classList.add("open")}
@@ -218,7 +213,7 @@ async function passwordMatches(stored, entered){
   if(typeof stored==="string" && stored.startsWith("sha256:")){
     return stored==="sha256:"+await hashPassword(entered);
   }
-  return stored===entered; // backward compatibility with existing local data
+  return stored===entered;
 }
 async function storePassword(value){return "sha256:"+await hashPassword(value)}
 function saveSession(){
@@ -311,10 +306,9 @@ function startTest(id){
     parent.postMessage({type:"CBT_RESULT",testId:"...",score:25,accuracy:83.33,time:"18:20"},"*")
     when it is embedded. For direct navigation, use the return URL below.
   */
-  const returnUrl=location.href.split("#")[0];
+  const returnUrl=location.href.split("#")[0]+"#return="+encodeURIComponent(t.id);
   sessionStorage.setItem("cbtReturn",returnUrl);
-  const sep=t.file.includes("?")?"&":"?";
-  location.href=t.file+sep+"testId="+encodeURIComponent(t.id);
+  location.href=t.file;
 }
 function renderCandidateRanking(){
   const rows=state.results.slice().sort((a,b)=>b.score-a.score);
